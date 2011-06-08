@@ -2360,7 +2360,14 @@ int ssh_channel_read(ssh_channel channel, void *dest, uint32_t count, int is_std
       break;
     }
 
-    ssh_handle_packets(session,-1);
+    
+    //ssh_handle_packets(session,-1);
+    //let's not block forever and if an error occures, return failure...  
+    ssh_handle_packets(session,5000);  
+    if (channel->session->session_state == SSH_SESSION_STATE_ERROR){
+      leave_function();
+      return -1;
+    } 
   }
 
   len = buffer_get_rest_len(stdbuf);
